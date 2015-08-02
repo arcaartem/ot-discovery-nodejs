@@ -1,6 +1,8 @@
 var request = require("request");
 var uuid = require('node-uuid');
 
+var _announcementInterval = 250;
+
 /*
  * DiscoveryClient constructor.
  * Creates a new uninitialized DiscoveryClient.
@@ -74,7 +76,7 @@ DiscoveryClient.prototype.connect = function (onComplete) {
     });
 
     disco._schedulePoll();
-    setInterval(disco._announce.bind(disco), 10000);
+    setInterval(disco._announce.bind(disco), _announcementInterval);
     onComplete(undefined, disco.host, disco.servers);
   });
 };
@@ -245,7 +247,7 @@ DiscoveryClient.prototype._singleAnnounce = function (announcement, cb) {
   if (!server) {
     this.logger.log('info', 'Cannot announce. No discovery servers available');
     cb(new Error('Cannot announce. No discovery servers available'));
-    disco._scheduleReconnect(); 
+    disco._scheduleReconnect();
     return;
   }
   this.logger.log('debug', 'Announcing ' + JSON.stringify(announcement));

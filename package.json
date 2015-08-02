@@ -12,8 +12,16 @@
   },
   "author": "Steven Schlansker",
   "dependencies": {
+    "body-parser": "^1.13.3",
+    "colors": "^1.1.2",
+    "express": "^4.13.1",
+    "heapdump": "^0.3.6",
+    "moment": "^2.10.6",
+    "node-mkdirp": "0.0.1",
     "node-uuid": "^1.4.2",
-    "request": "^2.53.0"
+    "request": "^2.53.0",
+    "util": "^0.10.3",
+    "uuid": "^2.0.1"
   },
   "devDependencies": {
     "grunt": "^0.4.5",
