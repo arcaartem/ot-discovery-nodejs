@@ -6,6 +6,7 @@ var gulpSequence = require('gulp-sequence');
 var sourcemaps = require('gulp-sourcemaps');
 var coffee = require('gulp-coffee');
 var gutil = require('gulp-util');
+var del = require('del');
 
 var scripts = ['src/**/*.coffee', 'src/**/*.js'];
 var tests = ['test/**/*.coffee', 'test/**/*.js'];
@@ -30,10 +31,16 @@ gulp.task('test-all', gulpSequence('ot-release-no-coverage-test', 'ot-release-co
 
 gulp.task('lint', ['ot-release-lint-coffee']);
 
-gulp.task('build-coffee', function () {
+gulp.task('clean:lib', function (cb) {
+  del(['lib/**/*'], cb);
+});
+
+gulp.task('build:lib', ['clean:lib'], function () {
   gulp.src('./src/*.coffee')
     .pipe(sourcemaps.init())
     .pipe(coffee({bare: true}).on('error', gutil.log))
     .pipe(sourcemaps.write())
     .pipe(gulp.dest('./lib/'));
 });
+
+gulp.task('lint', ['ot-release-lint-coffee']);
