@@ -10,7 +10,7 @@ module.exports = class DiscoveryAnnouncer
   constructor: (@logger, @announcementHost) ->
     @_announcedRecords = {}
     @HEARTBEAT_INTERVAL_MS = 10 * 1000
-    @REQUEST_TIMEOUT_MS = 10 * 1000
+    @REQUEST_TIMEOUT_MS = 5 * 1000
     @watcher = new DiscoveryWatcher
     @serverList = new ServerList @logger, @connect
 
