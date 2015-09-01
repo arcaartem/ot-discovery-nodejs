@@ -78,7 +78,7 @@ describe "DiscoveryAnnouncer", ->
         announcementId = result.announcementId
         expect(@logger.log.getCall(1).args).to.deep.equal [
           'debug',
-          """Announcing to http://discover-server/announcement{"serviceType":"test","serviceUri":"test","announcementId":"#{announcementId}"}"""
+          """Announcing to http://discover-server/announcement:{"serviceType":"test","serviceUri":"test","announcementId":"#{announcementId}"}"""
         ]
         done()
 
@@ -172,7 +172,7 @@ describe "DiscoveryAnnouncer", ->
           logs = _.pluck @logger.log.getCalls(), "args"
           expect(logs).deep.equal [
             [ 'info',  'Syncing discovery servers http://discover-server' ],
-            [ 'debug', 'Announcing to http://discover-server/announcement{"announcementId":"a1","serviceType":"my-new-service","serviceUri":"http://my-new-service:8080"}' ],
+            [ 'debug', 'Announcing to http://discover-server/announcement:{"announcementId":"a1","serviceType":"my-new-service","serviceUri":"http://my-new-service:8080"}' ],
             [ 'error', 'Failure Announcing to http://discover-server/announcement{"announcementId":"a1","serviceType":"my-new-service","serviceUri":"http://my-new-service:8080"}','ESOCKETTIMEDOUT' ],
             [ 'info', 'Dropping discovery server http://discover-server' ]
           ]
