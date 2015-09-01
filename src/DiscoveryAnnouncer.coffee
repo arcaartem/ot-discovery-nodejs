@@ -46,7 +46,8 @@ module.exports = class DiscoveryAnnouncer
       .then (server) =>
         url = server + "/announcement"
 
-        @logger.log "debug", "Announcing to #{url}" + JSON.stringify(announcement)
+        @logger.log "debug", "Announcing to #{url}:#{JSON.stringify(announcement)}"
+
         request
           url: url
           method: "POST"
