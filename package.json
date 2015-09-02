@@ -45,8 +45,5 @@
     "url": "https://github.com/opentable/ot-discovery-nodejs/issues"
   },
   "homepage": "https://github.com/opentable/ot-discovery-nodejs",
-  "directories": {
-    "test": "tests"
-  },
   "license": "MIT"
 }
