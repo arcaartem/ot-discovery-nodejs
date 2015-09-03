@@ -168,7 +168,7 @@ describe "DiscoveryAnnouncer", ->
       @announcer.announce(@announcement)
         .catch (e) =>
           expect(e.message).to.equal "ESOCKETTIMEDOUT"
-          expect(@announcer.serverList.servers).to.deep.equal []
+          expect(@announcer.serverList.servers).to.be.empty
           logs = _.pluck @logger.log.getCalls(), "args"
           expect(logs).deep.equal [
             [ 'info',  'Syncing discovery servers http://discover-server' ],
