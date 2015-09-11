@@ -1,6 +1,6 @@
 {
   "name": "ot-discovery",
-  "version": "0.9.5-beta",
+  "version": "0.9.6",
   "description": "Discovery Client",
   "main": "lib/DiscoveryClient.js",
   "scripts": {
