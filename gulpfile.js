@@ -42,5 +42,3 @@ gulp.task('build:lib', ['clean:lib'], function () {
     .pipe(sourcemaps.write())
     .pipe(gulp.dest('./lib/'));
 });
-
-gulp.task('lint', ['ot-release-lint-coffee']);
