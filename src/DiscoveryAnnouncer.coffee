@@ -10,6 +10,7 @@ module.exports = class DiscoveryAnnouncer
   constructor: (@logger, @announcementHost) ->
     @_announcedRecords = {}
     @HEARTBEAT_INTERVAL_MS = 10 * 1000
+    @REQUEST_TIMEOUT_MS = 5 * 1000
     @watcher = new DiscoveryWatcher
     @serverList = new ServerList @logger, @connect
 
@@ -52,8 +53,10 @@ module.exports = class DiscoveryAnnouncer
           method: "POST"
           json: true
           body: announcement
+          timeout:@REQUEST_TIMEOUT_MS
         .spread @handleResponse
         .catch (error) =>
+          @logger.log "error", "Failure Announcing to #{url}" + JSON.stringify(announcement), error.message
           @serverList.dropServer server
           throw error
 
