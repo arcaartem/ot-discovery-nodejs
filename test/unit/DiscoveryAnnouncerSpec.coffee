@@ -153,7 +153,6 @@ describe "DiscoveryAnnouncer", ->
 
 
     it "announce() exceed request timeout", (done) ->
-      @announcer.REQUEST_TIMEOUT_MS = 1000
       watch =
         nock @discoveryHost
           .get('/watch')
@@ -162,7 +161,7 @@ describe "DiscoveryAnnouncer", ->
       delayedAnnouncement =
         nock(@discoveryServer)
           .post('/announcement', @announcement)
-          .socketDelay(2000)
+          .socketDelay(@announcer.REQUEST_TIMEOUT_MS + 1000)
           .reply(200)
 
       @announcer.announce(@announcement)
