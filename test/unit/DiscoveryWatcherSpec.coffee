@@ -21,7 +21,7 @@ describe "DiscoveryWatcher", ->
     nock.cleanAll()
 
   it "watches with just a server using uri or hostname", (done) ->
-    
+
     watchfunc = (server) =>
       watch =
       nock("http://" + @discoveryServer)
@@ -76,7 +76,7 @@ describe "DiscoveryWatcher", ->
         watch.done()
         done()
 
-   it "aborts", (done) ->
+  it "aborts", (done) ->
     this.timeout 250 # make sure we timeout before the delay
     watch =
       nock "http://" + @discoveryServer
