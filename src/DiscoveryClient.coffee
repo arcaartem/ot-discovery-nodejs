@@ -85,7 +85,7 @@ class DiscoveryClient
     @announcementIndex.findAll service
 
   connect: (callback) =>
-    @discoveryWatcher.watch @host
+    @discoveryWatcher.watch @host, @_serviceType
       .spread @saveUpdates
       .then () =>
         @polling = true
@@ -100,7 +100,7 @@ class DiscoveryClient
 
   reconnect: () =>
     Utils.promiseRetry () =>
-      @discoveryWatcher.watch @host
+      @discoveryWatcher.watch @host, @_serviceType
         .spread (statusCode, updates) =>
           @saveUpdates statusCode, updates
           @announcementIndex.getDiscoveryServers()
@@ -174,7 +174,7 @@ class DiscoveryClient
   poll: () =>
     @serverList.getRandom()
       .then (server) =>
-        @discoveryWatcher.watch server, @serviceType, @announcementIndex.index + 1
+        @discoveryWatcher.watch server, @_serviceType, @announcementIndex.index + 1
           .spread (statusCode, update) =>
             if statusCode isnt 204
               @saveUpdates statusCode, update
