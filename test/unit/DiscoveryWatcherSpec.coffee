@@ -21,7 +21,7 @@ describe "DiscoveryWatcher", ->
     nock.cleanAll()
 
   it "watches with just a server using uri or hostname", (done) ->
-    
+
     watchfunc = (server) =>
       watch =
       nock("http://" + @discoveryServer)
@@ -40,7 +40,8 @@ describe "DiscoveryWatcher", ->
   it "watches with servicename and index", (done) ->
     watch =
       nock("http://" + @discoveryServer)
-        .get('/watch?since=100&clientServiceType=foo')
+        .get('/watch')
+        .query({since: 100, clientServiceType: 'foo'})
         .reply(200, @reply)
 
     @discoveryWatcher.watch @discoveryServer, 'foo', 100
@@ -76,7 +77,7 @@ describe "DiscoveryWatcher", ->
         watch.done()
         done()
 
-   it "aborts", (done) ->
+  it "aborts", (done) ->
     this.timeout 250 # make sure we timeout before the delay
     watch =
       nock "http://" + @discoveryServer

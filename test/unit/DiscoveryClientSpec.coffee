@@ -105,8 +105,9 @@ describe "DiscoveryClient", ->
           serviceUri: 'a.disco'
         }]
 
-      @discoveryClient.discoveryWatcher.watch = sinon.spy (server) ->
+      @discoveryClient.discoveryWatcher.watch = sinon.spy (server, svcType) ->
         expect(server).to.equal api2testHosts.discoverRegionHost
+        expect(svcType).to.equal('testService')
         Promise.resolve [200, updates]
 
       sinon.spy @discoveryClient.announcementIndex, 'processUpdate'
