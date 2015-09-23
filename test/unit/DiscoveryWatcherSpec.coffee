@@ -40,7 +40,8 @@ describe "DiscoveryWatcher", ->
   it "watches with servicename and index", (done) ->
     watch =
       nock("http://" + @discoveryServer)
-        .get('/watch?since=100&clientServiceType=foo')
+        .get('/watch')
+        .query({since: 100, clientServiceType: 'foo'})
         .reply(200, @reply)
 
     @discoveryWatcher.watch @discoveryServer, 'foo', 100
