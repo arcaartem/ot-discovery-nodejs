@@ -297,13 +297,13 @@ describe "DiscoveryClient", ->
 
     it "find calls announcementIndex", ->
       replaceMethod @discoveryClient.announcementIndex, 'find'
-      @discoveryClient.find("discovery")
-      expect(@discoveryClient.announcementIndex.find.called).to.be.ok
+      @discoveryClient.find('discovery', 'region')
+      expect(@discoveryClient.announcementIndex.find).to.be.calledWith('discovery', 'region')
 
     it "findAll calls announcementIndex", ->
       replaceMethod @discoveryClient.announcementIndex, 'findAll'
-      @discoveryClient.findAll("discovery")
-      expect(@discoveryClient.announcementIndex.findAll.called).to.be.ok
+      @discoveryClient.findAll('discovery', 'region')
+      expect(@discoveryClient.announcementIndex.findAll).to.be.calledWith('discovery', 'region')
 
     it "make sure discovery can be promisified", ->
       expect(@discoveryClient).to.respondTo 'connectAsync'

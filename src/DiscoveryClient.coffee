@@ -78,11 +78,11 @@ class DiscoveryClient
   onError: (fn) ->
     @discoveryNotifier.onError fn
 
-  find: (service) ->
-    @announcementIndex.find service
+  find: (service, discoverRegion) ->
+    @announcementIndex.find service, discoverRegion
 
-  findAll: (service) ->
-    @announcementIndex.findAll service
+  findAll: (service, discoverRegion) ->
+    @announcementIndex.findAll service, discoverRegion
 
   connect: (callback) =>
     @discoveryWatcher.watch @host, @_serviceType
