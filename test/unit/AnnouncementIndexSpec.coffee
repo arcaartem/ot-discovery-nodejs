@@ -17,7 +17,7 @@ describe "AnnouncementIndex", ->
         "announcementId":"a2"
         "environment":"prod-sc"
         "serviceType":"myservice"
-        "serviceUri":"http://1.1.1.1:2"
+        "serviceUri":"http://2.2.2.2:2"
       }
     ]
 
@@ -53,7 +53,7 @@ describe "AnnouncementIndex", ->
   it "computeDiscoverServers()", ->
     @announcementIndex.computeDiscoveryServers()
     expect(@announcementIndex.getDiscoveryServers())
-      .to.deep.equal [@sampleAnnouncements[1].serviceUri]
+      .to.deep.equal [@sampleAnnouncements[0].serviceUri]
 
   it "processUpdate - fullUpdate", ->
     @announcementIndex.processUpdate
@@ -108,23 +108,14 @@ describe "AnnouncementIndex", ->
     ]
 
   describe "findAll()", ->
-    it 'without discoveryRegion defined works', ->
-      expect(@announcementIndex.findAll()).to.deep.equal []
-      expect(@announcementIndex.findAll("discovery")).to.deep.equal [
-        @sampleAnnouncements[0].serviceUri
-      ]
-      expect(@announcementIndex.findAll("discovery:none"))
-        .to.deep.equal []
-      expect(@announcementIndex.findAll("discovery:test")).to.deep.equal [
-        @sampleAnnouncements[0].serviceUri
-      ]
-      predicate = (announcement)->
-        announcement.serviceType is "myservice"
-      expect(@announcementIndex.findAll(predicate)).to.deep.equal [
-        @sampleAnnouncements[1].serviceUri
-      ]
+    it 'throws if no discovery region is passed in', ->
+      try
+        @announcementIndex.findAll 'region'
+      catch e
+        return expect(e).to.be.ok
+      assert.fail 'exception did not get thrown'
 
-    describe 'with discoveryRegion defined to a non-announcing region', ->
+    describe 'with discoveryRegion defined to a non-announcing region  (fallback to other regions)', ->
       {sampleAnnouncements} = {}
 
       beforeEach ->
@@ -134,30 +125,30 @@ describe "AnnouncementIndex", ->
             "environment":"prod-uswest2"
             "feature":"test"
             "serviceType":"discovery"
-            "serviceUri":"http://2.2.2.2:2"
+            "serviceUri":"http://1.1.1.1:prod-uswest2"
           },
           {
             "announcementId":"b2"
             "environment":"prod-sc"
             "serviceType":"myservice"
-            "serviceUri":"http://2.2.2.2:2"
+            "serviceUri":"http://2.2.2.2:prod-sc"
           }
         ]
 
         @announcementIndex.addAnnouncements sampleAnnouncements
 
-      it 'retrieves all announcements for that service regardless of region', ->
-        results = @announcementIndex.findAll('discovery', 'prod-sc')
+      it 'retrieves all announcements for that service', ->
+        results = @announcementIndex.findAll 'discovery', 'prod-sc'
         expect(results).to.have.length 2
         expect(results).to.deep.equal [
           @sampleAnnouncements[0].serviceUri
           sampleAnnouncements[0].serviceUri
         ]
 
-      it 'will not retrieve disco announcements for services with an undefined experiment', ->
+      it 'will not retrieve disco announcements for services with an undefined feature', ->
         expect(@announcementIndex.findAll('discovery:none', 'prod-sc')).to.deep.equal []
 
-      it 'will retrieve disco announcements for services with a defined experiment', ->
+      it 'will retrieve disco announcements for services with a defined feature', ->
         expect(@announcementIndex.findAll('discovery:test', 'prod-sc')).to.deep.equal [
           @sampleAnnouncements[0].serviceUri
           sampleAnnouncements[0].serviceUri
@@ -173,137 +164,68 @@ describe "AnnouncementIndex", ->
             "environment":"prod-sc"
             "feature":"test"
             "serviceType":"discovery"
-            "serviceUri":"http://2.2.2.2:2"
+            "serviceUri":"http://1.1.1.1:prod-sc"
           },
           {
             "announcementId":"b2"
             "environment":"prod-uswest2"
             "serviceType":"myservice"
-            "serviceUri":"http://2.2.2.2:2"
+            "serviceUri":"http://2.2.2.2:prod-uswest2"
           }
         ]
 
         @announcementIndex.addAnnouncements sampleAnnouncements
 
       it 'retrieves all announcements for that service for the given region', ->
-        results = @announcementIndex.findAll('discovery', 'prod-sc')
+        results = @announcementIndex.findAll 'discovery', 'prod-sc'
         expect(results).to.have.length 1
         expect(results).to.deep.equal [ sampleAnnouncements[0].serviceUri ]
 
-      it 'will not retrieve disco announcements for services with an undefined experiment', ->
+      it 'retrieves all announcements for that service for the other region', ->
+        results = @announcementIndex.findAll 'discovery', 'prod-uswest2'
+        expect(results).to.have.length 1
+        expect(results).to.deep.equal [ @sampleAnnouncements[0].serviceUri ]
+
+      it 'retrieves all announcements for that service with a unannounced region', ->
+        results = @announcementIndex.findAll 'discovery', 'foo-bar-land'
+        expect(results).to.have.length 2
+        expect(results).to.deep.equal [
+          @sampleAnnouncements[0].serviceUri
+          sampleAnnouncements[0].serviceUri
+        ]
+
+      it 'will not retrieve disco announcements for services with an undefined feature', ->
         expect(@announcementIndex.findAll('discovery:none', 'prod-sc')).to.deep.equal []
 
-      it 'will retrieve disco announcements for services with a defined experiment', ->
+      it 'will retrieve disco announcements for services with a defined feature', ->
         expect(@announcementIndex.findAll('discovery:test', 'prod-uswest2')).to.deep.equal [
           @sampleAnnouncements[0].serviceUri
         ]
 
       it 'will filter results by a given predicate', ->
         predicate = (announcement)->
-          announcement.serviceType is 'myservice' and announcement.environment is 'prod-uswest2'
-        expect(@announcementIndex.findAll(predicate)).to.deep.equal [
+          announcement.serviceType is 'myservice'
+        expect(@announcementIndex.findAll(predicate, 'prod-uswest2')).to.deep.equal [
           sampleAnnouncements[1].serviceUri
         ]
 
-  it "find()", ->
-    expect(@announcementIndex.find()).to.equal undefined
-    expect(@announcementIndex.find("discovery"))
-      .to.deep.equal @sampleAnnouncements[0].serviceUri
-    @announcementIndex.addAnnouncements [
-      { "announcementId":"d1", "serviceType":"discovery", serviceUri:"uri" }
-      { "announcementId":"d2", "serviceType":"discovery", serviceUri:"uri" }
-      { "announcementId":"d3", "serviceType":"discovery", serviceUri:"uri"}
-    ]
+  describe "find()", ->
+    before ->
+      # the beforeEach above is blowing out @announcementIndex
+      @index = new AnnouncementIndex
+      sinon.spy @index, 'findAll'
 
-    expect(@announcementIndex.find("discovery")).to.exist
-
-describe "AnnouncementIndex multi region", ->
-  describe "find api", ->
-    beforeEach ->
-      @serverList =
-        addServers: sinon.spy()
-      @announcementIndex = new AnnouncementIndex @serverList
-
-      @sampleAnnouncements = [
-        {
-          "announcementId":"a1",
-          "serviceType":"discovery",
-          "serviceUri":"http://1.1.1.1:2"
-          "feature":"test",
-          "environment": api2testHosts.announceHosts[0]
-        },
-        {
-          "announcementId":"a2",
-          "serviceType":"myservice",
-          "serviceUri":"http://1.1.1.1:3"
-          "environment": api2testHosts.announceHosts[0]
-        },
-        {
-          "announcementId":"a2b",
-          "serviceType":"myservice",
-          "serviceUri":"http://99.99.99.99:3"
-          "environment": api2testHosts.announceHosts[1]
-        },
-        {
-          "announcementId":"a3",
-          "serviceType":"nonlocalservice",
-          "serviceUri":"http://99.99.99.99:4"
-          "environment": api2testHosts.announceHosts[1]
-        },
-        {
-          "announcementId":"a4a",
-          "serviceType":"tonsofservers",
-          "serviceUri":"http://1.1.1.1:1"
-          "environment": api2testHosts.announceHosts[0]
-        },
-        {
-          "announcementId":"a4b",
-          "serviceType":"tonsofservers",
-          "serviceUri":"http://1.1.1.1:2"
-          "environment": api2testHosts.announceHosts[0]
-        },
-        {
-          "announcementId":"a4c",
-          "serviceType":"tonsofservers",
-          "serviceUri":"http://1.1.1.1:3"
-          "environment": api2testHosts.announceHosts[0]
-        },
-        {
-          "announcementId":"a4d",
-          "serviceType":"tonsofservers",
-          "serviceUri":"http://1.1.1.9:3"
-          "environment": api2testHosts.announceHosts[1]
-        }
+      # note this also tests that we find with no environment (old non-cross announcing services)
+      @index.addAnnouncements [
+        { "announcementId":"d1", "serviceType":"serviceA", serviceUri:"http://1.1.1.1:3"}
+        { "announcementId":"d2", "serviceType":"serviceA", serviceUri:"http://1.1.1.1:4"}
+        { "announcementId":"d3", "serviceType":"serviceA", serviceUri:"http://1.1.1.1:5"}
       ]
 
-      @announcementIndex.addAnnouncements @sampleAnnouncements
+      @result = @index.find 'serviceA', 'r'
 
-    it "findAll() should return local environment services given two regions", ->
-      predicate = (announcement)->
-        announcement.serviceType is "myservice"
+    it 'calls findAll()', ->
+      expect(@index.findAll).to.have.been.called
 
-      expect(@announcementIndex.findAll(predicate, api2testHosts.announceHosts[0]))
-        .to.deep.equal [
-          @sampleAnnouncements[1].serviceUri
-        ]
-
-    it "should return non-local environment given only non-local environment", ->
-      predicate = (announcement)->
-        announcement.serviceType is "nonlocalservice"
-
-      expect(@announcementIndex.findAll(predicate)).to.deep.equal [
-        @sampleAnnouncements[3].serviceUri
-      ]
-
-    it "should return all the local services given predicate", ->
-      predicate = (announcement)->
-        announcement.serviceType is "tonsofservers"
-
-      expect(@announcementIndex.findAll(predicate)).to.deep.equal [
-        @sampleAnnouncements[4].serviceUri,
-        @sampleAnnouncements[5].serviceUri,
-        @sampleAnnouncements[6].serviceUri,
-        @sampleAnnouncements[7].serviceUri
-      ]
-
-
+    it 'picks one result', ->
+      expect(@result).to.contain 'http://1.1.1.1'

@@ -41,8 +41,9 @@ class DiscoveryClient
     else
       @options = announcementHosts
       @_announcementHosts = [@host]
+      homeRegionName = @host
 
-    @_homeRegionName = homeRegionName || null
+    @_homeRegionName = homeRegionName
     @_serviceType = serviceType || null
 
     if arguments.length >= 4
@@ -78,11 +79,13 @@ class DiscoveryClient
   onError: (fn) ->
     @discoveryNotifier.onError fn
 
-  find: (service, discoverRegion) ->
-    @announcementIndex.find service, discoverRegion
+  find: (service, discoveryRegion) ->
+    discoveryRegion ?= @_homeRegionName
+    @announcementIndex.find service, discoveryRegion
 
-  findAll: (service, discoverRegion) ->
-    @announcementIndex.findAll service, discoverRegion
+  findAll: (service, discoveryRegion) ->
+    discoveryRegion ?= @_homeRegionName
+    @announcementIndex.findAll service, discoveryRegion
 
   connect: (callback) =>
     @discoveryWatcher.watch @host, @_serviceType

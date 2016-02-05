@@ -50,6 +50,8 @@ class AnnouncementIndex
     ]
 
   findAll: (predicate, discoverRegion) ->
+    throw new Error('discovery region required') unless discoverRegion?
+    
     unless _.isFunction predicate
       predicate = @serviceTypePredicate.bind @, predicate
 
