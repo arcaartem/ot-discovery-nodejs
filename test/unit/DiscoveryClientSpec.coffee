@@ -297,14 +297,24 @@ describe "DiscoveryClient", ->
 
     it "find calls announcementIndex", ->
       replaceMethod @discoveryClient.announcementIndex, 'find'
-      @discoveryClient.find('discovery', 'region')
-      expect(@discoveryClient.announcementIndex.find).to.be.calledWith('discovery', 'region')
+      @discoveryClient.find 'discovery', 'region'
+      expect(@discoveryClient.announcementIndex.find).to.be.calledWith 'discovery', 'region'
 
     it "findAll calls announcementIndex", ->
       replaceMethod @discoveryClient.announcementIndex, 'findAll'
-      @discoveryClient.findAll('discovery', 'region')
-      expect(@discoveryClient.announcementIndex.findAll).to.be.calledWith('discovery', 'region')
+      @discoveryClient.findAll 'discovery', 'region'
+      expect(@discoveryClient.announcementIndex.findAll).to.be.calledWith 'discovery', 'region'
 
+    it "find calls announcementIndex with home region name if none is passed in", ->
+      replaceMethod @discoveryClient.announcementIndex, 'find'
+      @discoveryClient.find 'discovery'
+      expect(@discoveryClient.announcementIndex.find).to.be.calledWith 'discovery', 'homeregion'
+
+    it "findAll calls announcementIndex with home region name if none is passed in", ->
+      replaceMethod @discoveryClient.announcementIndex, 'findAll'
+      @discoveryClient.findAll 'discovery'
+      expect(@discoveryClient.announcementIndex.findAll).to.be.calledWith 'discovery', 'homeregion'
+      
     it "make sure discovery can be promisified", ->
       expect(@discoveryClient).to.respondTo 'connectAsync'
       expect(@discoveryClient).to.respondTo 'announceAsync'
