@@ -24,7 +24,7 @@ class AnnouncementIndex
   addAnnouncements: (announcements) ->
     @_announcements = _.extend @_announcements,
       _.indexBy(announcements, "announcementId")
-    
+
   getAnnouncements: () ->
     @_announcements
 
@@ -67,7 +67,7 @@ class AnnouncementIndex
       .pluck "serviceUri"
       .value()
 
-  find: (predicate) ->
-    _.sample @findAll(predicate)
+  find: (predicate, discoverRegion) ->
+    _.sample @findAll(predicate, discoverRegion)
 
 module.exports = AnnouncementIndex
